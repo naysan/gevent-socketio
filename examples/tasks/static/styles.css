@@ -1,0 +1,126 @@
+body {
+  background-color: #fff;
+}
+#container {
+  margin: 0 auto;
+  width: 550px;
+  padding: 20px;
+  background-color: #FFF;
+}
+
+h1 {
+  margin: 0;
+  padding: 0;
+  border-bottom: solid 1px #000;
+  width: 80%;
+}
+
+#chatlog {
+  height: 200px;
+  width : 500px;
+  overflow-y: scroll;
+  border: solid 1px #888;
+  margin:5px;
+}
+
+#chatbox {
+  width: 470px;
+  border: solid 1px #888;
+  margin:5px;
+}
+
+#userTo
+{
+	display: inline;
+	margin-top: 20px; 
+	padding: 0 .7em;
+	height:30px;
+}
+
+#userFrom
+{
+	display:inline;
+	margin-top: 20px; 
+	padding: 0 .7em;
+	height:30px;
+}
+
+.start_chat
+{
+	width:80px;
+}
+
+.new_user
+{
+	display:block;
+	text-align: left;
+}
+
+.new_user_name
+{
+	width:80px;
+	display:inline;
+	text-align: left;
+}
+
+.new_user_icon
+{
+	width:40px;
+	display:inline;
+	text-align: left;
+}
+
+.new_user_action
+{
+	width:50px;
+	display:inline;
+	text-align: left;
+}
+
+.simple_button
+{
+	display:inline;
+}
+
+.header
+{
+	display:block;
+	color: #32B5ED;
+	font-size:14px;
+}
+
+.quit_chat
+{
+	display:block;
+	margin:10px;
+}
+
+#room_name
+{
+	display:inline;
+}
+
+.you
+{
+	display:inline;
+	font-style:italic;
+	color:#32B5ED;
+}
+
+#rtc_remote_video
+{
+	display:inline;
+	width : 200px;
+	height:150px;
+}
+
+#rtc_video
+{
+	display:inline;
+	width : 200px;
+	height:150px;
+}
+
+
+
+
