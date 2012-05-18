@@ -1,3 +1,26 @@
+#
+#  @file
+#  Server side behaviour of the basic webRTC-gevent-socketIO
+#  chat prototype.
+# 
+#  @copyright 2012 Savoir-faire Linux, inc.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#  @author Naysan Saran <naysan.saran@savoirfairelinux.com>
+#
+
 import os
 import re
 
@@ -15,36 +38,69 @@ from socketio.mixins 		import RoomsMixin, BroadcastMixin
 
 from wsgiref.simple_server import make_server
 
+# In this example, there is only one room with a maximum of two users
+# False means that the user is not connected yet.
+room = { 'user1' : False, 'user2' : False } 
 
-room = { 'user1' : False, 'user2' : False }
 
-
-#------------------------------------------------------------------------------    
-# 			GlobalIONamespace : namespace for the "socket" object
-#------------------------------------------------------------------------------
 class GlobalIONamespace(BaseNamespace, BroadcastMixin):
-        
-	def on_login(self):
+	"""
+		GlobalIONamespace : namespace for the "socket" object
+	"""   
 
+	def on_login(self):
+		"""
+			@def 	on_login(self)
+			@param  	None
+			
+			Triggered by a socket.emit('login') from the client.
+			
+			The first client to call socket.emit('login') will receive the 
+			nickname "user1", the second client will be "user2".
+			After that, the room is full until one user quits the chat
+			and the room becomes available again.
+	 	""" 
+	 	
 		if room['user1'] and room['user2'] :
-			self.emit("message", "This very simple example can only handle two people connected.")
+			self.emit("message", "This example can only handle two people at the time.")
 			return
-		
+	
 		if not room['user1']:
 			self.emit("set_nickname", "user1")
 			room['user1'] = True
 		else:
 			self.emit("set_nickname", "user2")
 			room['user2'] = True
+	
+	
+	def on_rtc_message(self, sdp ):
+		"""
+			@def 	on_rtc_message(self, sdp )
+			@param  	The sdp message paquet sent by the client
+			
+			Triggered by a socket.emit('rtc_message', sdp) from the client.
+			
+			Since there are only two users at the same time in this example,
+			we will use broadcast_event_not_me() to forward the message to 
+			the other peer.
+		""" 
+	   	self.broadcast_event_not_me("rtc_message", sdp)
+
+	def on_peer_left(self):
+		"""
+			@def 	on_peer_left(self)
+			@param  	None
+			
+			Triggered by a socket.emit('peer_left', sdp) from the client.
+			
+			Let the other peer know that the conversation is over and make
+			the room available again.
+		""" 
 		
-     	
-	def on_rtc_invite(self, sdp ):
-	   	self.broadcast_event_not_me("rtc_answer", sdp)
-   	
-   	def on_peer_left(self):
-   		print "Peer left the chat"
+		print "Peer left the chat"
 		self.broadcast_event_not_me("peer_left")
-		
+		room['user1'] = False
+		room['user2'] = False
 
 nsmap = { '': GlobalIONamespace }
 

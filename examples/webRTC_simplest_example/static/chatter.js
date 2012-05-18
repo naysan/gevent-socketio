@@ -1,3 +1,26 @@
+/**
+ *  @file
+ *  Brief description of what the file does, along with the project's name
+ * 
+ *  @copyright 2012 Savoir-faire Linux, inc.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @author Author name <author.name@savoirfairelinux.com>
+ *
+ */
+ 
 var socket = null;
 var localVideo;
 var remoteVideo;
@@ -5,6 +28,15 @@ var localStream;
 var pc;
 var send_permitted = false;
 
+/*! @fn	 	quitChat()
+ *  @brief 	This function is called when the user clicks on the "QUIT CHAT" button.
+ *         	Nothing is sent to the server if the chat hasn't started yet. 
+ *		 	Otherwise, the "peer_left" event will be sent to the server (server.py)
+ *		 	so the server can alert the other user that the peer left, and reset
+ *		 	the room to empty.
+ *  @param 	None
+ *  @return 	None
+ */
 function quitChat() {
 
 	if ( pc == null || send_permitted == false ) {
@@ -18,28 +50,32 @@ function quitChat() {
 	cleanUp();
 }
 
+/*! @fn	 	cleanUp()
+ *  @brief 	Closes the socketio and the webRTC connection.
+ *  @param 	None
+ *  @return 	None
+ */
 function cleanUp() {
 
 	console.log("Cleaning up.");
-	localVideo.style.opacity  = 0.5;
-	remoteVideo.style.opacity = 0.5;
 	pc.close();
 	socket.disconnect();
 	pc = null;
 	socket = null;
 }
 
+
 $(document).ready( function() {
 	
 	  socket 	= io.connect(); // connect to the websocket
 	  
-	  localVideo  = document.getElementById("localVideo");
+	  localVideo  = document.getElementById("localVideo"); // from index.mako
     	  remoteVideo = document.getElementById("remoteVideo");
 	  
 	  socket.on("set_nickname", function(nickname) {
 	  
 			$("#events").html("Your nickname is set to " + nickname );	
-			
+			 
 			if (nickname == "user1") {
 				getUserMedia();
 			}
@@ -54,7 +90,7 @@ $(document).ready( function() {
 	  		$("#events").html(message);
 	  });
 
-	  socket.on("rtc_answer", function(message) {
+	  socket.on("rtc_message", function(message) {
 	  
 	  		console.log('S->C: ' + message);
 	    		
@@ -79,7 +115,7 @@ $(document).ready( function() {
 	  	cleanUp();
 	  });
 	  
-	  socket.emit("login");
+	  socket.emit("login"); // attempt to log in
 	  
 });
 
@@ -156,7 +192,7 @@ createPeerConnection = function() {
 onSignalingMessage = function(message) 
 {
 	console.log("C->S ", message);
-	socket.emit("rtc_invite", message);
+	socket.emit("rtc_message", message);
 }
   
 maybeStart = function() 
